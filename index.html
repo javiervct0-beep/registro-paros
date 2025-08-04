@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Paros</title>
+</head>
+<body>
+  <h2>Formulario de Paros</h2>
+
+  <label>Celda:</label>
+  <select id="celda">
+    <option value="A31">A31</option>
+    <option value="A32">A32</option>
+    <option value="A33">A33</option>
+    <option value="A34">A34</option>
+    <option value="A35">A35</option>
+    <option value="A36">A36</option>
+    <option value="A37">A37</option>
+    <option value="A38">A38</option>
+  </select><br><br>
+
+  <label>Causa del Paro:</label>
+  <input type="text" id="causa"><br><br>
+
+  <label>Tipo de Paro:</label>
+  <select id="tipo">
+    <option value="Interno">Interno</option>
+    <option value="Externo">Externo</option>
+  </select><br><br>
+
+  <label>Área Responsable:</label>
+  <select id="area">
+    <option value="Mantenimiento">Mantenimiento</option>
+    <option value="Producción">Producción</option>
+    <option value="Logística">Logística</option>
+    <option value="Calidad">Calidad</option>
+    <option value="Materiales">Materiales</option>
+  </select><br><br>
+
+  <button onclick="iniciarParo()">Iniciar Paro</button>
+  <button onclick="finalizarParo()">Finalizar Paro</button>
+
+  <p id="respuesta"></p>
+
+  <script>
+    const url = "https://script.google.com/macros/s/AKfycbxmT-JmeBStt9W4_NuBVM_IJ6-Sc5EA55lP-x-PtN8Np8BsqzNtpxt_xqkI9go_b3qM/exec";
+
+    function obtenerHoraActual() {
+      const ahora = new Date();
+      return ahora.toTimeString().split(" ")[0];
+    }
+
+    function obtenerFechaActual() {
+      const ahora = new Date();
+      return ahora.toISOString().split("T")[0];
+    }
+
+    function iniciarParo() {
+      const datos = {
+        accion: "iniciar",
+        celda: document.getElementById("celda").value,
+        fecha: obtenerFechaActual(),
+        horaInicio: obtenerHoraActual(),
+        causa: document.getElementById("causa").value,
+        tipo: document.getElementById("tipo").value,
+        area: document.getElementById("area").value
+      };
+
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify(datos),
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(r => r.text())
+      .then(texto => document.getElementById("respuesta").innerText = texto)
+      .catch(err => document.getElementById("respuesta").innerText = "Error al iniciar paro");
+    }
+
+    function finalizarParo() {
+      const datos = {
+        accion: "finalizar",
+        celda: document.getElementById("celda").value,
+        horaFin: obtenerHoraActual()
+      };
+
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify(datos),
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(r => r.text())
+      .then(texto => document.getElementById("respuesta").innerText = texto)
+      .catch(err => document.getElementById("respuesta").innerText = "Error al finalizar paro");
+    }
+  </script>
+</body>
+</html>
